@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".VolunteerFormActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:text="자원 봉사 도우미"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                />
+            <Button
+                android:id="@+id/logoutButton"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"
+                android:text="로그아웃"
+                android:textSize="14dp"
+                android:textstyle="bold"/>
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="봉사 이름"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/Volunteer_name"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.227"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+            <TextView
+                android:id="@+id/textViewPersons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:text="모집 인원"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/Volunteer_name" />
+
+            <TextView
+                android:id="@+id/persons"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPersons" />
+
+            <TextView
+                android:id="@+id/textViewDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="시작일"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/persons" />
+
+            <TextView
+                android:id="@+id/textViewendDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="75dp"
+                android:layout_marginTop="16dp"
+                android:text="마감일"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/textViewDuration"
+                app:layout_constraintTop_toBottomOf="@+id/priority" />
+
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/duration2"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDuration" />
+
+            <TextView
+                android:id="@+id/duration2"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDuration" />
+
+            <TextView
+                android:id="@+id/textViewOnorOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="75dp"
+                android:layout_marginTop="16dp"
+                android:text="봉사 시간"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/textViewendDate"
+                app:layout_constraintTop_toBottomOf="@+id/persons" />
+
+            <TextView
+                android:id="@+id/OnorOff"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/duration"
+                app:layout_constraintTop_toBottomOf="@+id/textViewOnorOff" />
+
+
+            <TextView
+                android:id="@+id/textViewpriority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="100dp"
+                android:layout_marginTop="16dp"
+                android:text="우선 사항"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/textViewPersons"
+                app:layout_constraintTop_toBottomOf="@+id/Volunteer_name" />
+
+            <TextView
+                android:id="@+id/priority"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="66dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/persons"
+                app:layout_constraintTop_toBottomOf="@+id/textViewpriority" />
+
+            <TextView
+                android:id="@+id/textViewAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="봉사 장소"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/duration2" />
+
+            <TextView
+                android:id="@+id/editaddress"
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewAddress" />
+
+            <TextView
+                android:id="@+id/textViewContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="주요 내용"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editaddress" />
+
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="360dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:textColor="#ffffff"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewContent" />
+
+            <Button
+                android:id="@+id/button_map2"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:text="지도"
+                android:textColor="#ffffff"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:backgroundTint="#FF3C00"
+                app:layout_constraintStart_toEndOf="@+id/editaddress"
+                app:layout_constraintTop_toBottomOf="@+id/textViewAddress" />
+
+            <Button
+                android:id="@+id/button_Apply"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="56dp"
+                android:layout_marginTop="28dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:text="신청 하기"
+                android:textColor="#ffffff"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:backgroundTint="#FF3C00"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/content" />
+
+            <Button
+                android:id="@+id/button_Tolist"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="56dp"
+                android:layout_marginTop="28dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"
+                android:text="목록 으로"
+                android:textColor="#ffffff"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                app:backgroundTint="#FF3C00"
+                app:layout_constraintStart_toEndOf="@+id/button_Apply"
+                app:layout_constraintTop_toBottomOf="@+id/content" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
