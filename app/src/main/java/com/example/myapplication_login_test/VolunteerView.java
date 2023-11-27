@@ -141,7 +141,7 @@ public class VolunteerView extends AppCompatActivity {
         // Volunteer 신청 버튼 클릭 리스너
         Intent intent2 = getIntent();
         String applicantUsername = intent2.getStringExtra("username");
-        Apply.setOnClickListener(view -> applyForVolunteer(matchingForm.getTitle(), applicantUsername));
+        Apply.setOnClickListener(view -> applyForVolunteer(VolunteerName.toString(), applicantUsername));
     }
 
     // 이름이 일치하는 봉사폼 찾기
