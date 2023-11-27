@@ -12,6 +12,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -43,5 +44,9 @@ public interface ApiService {
     @GET("/api/volunteer/list/getVolunteerList") // 실제 API 엔드포인트와 메서드를 맞게 수정해야 함
     Call<List<VolunteerList>> getVolunteerList();
 
+    @GET("/api/volunteer/find-id-by-title")
+    Call<Long> findVolunteerFormIdByTitle(@Query("title") String title);
 
+    @POST("/api/volunteer-application/apply")
+    Call<Void> applyForVolunteer(VolunteerApplicationRequest applicationRequest);
 }

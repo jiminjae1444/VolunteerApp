@@ -31,8 +31,9 @@ public class VolunteerView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_volunteerview);
-        Button logout = findViewById(R.id.logoutButton);
 
+        Button logout = findViewById(R.id.logoutButton);
+        Button Apply = findViewById(R.id.button_Apply);
         Button buttonlist = findViewById(R.id.button_Tolist);
         TextView VolunteerName = findViewById(R.id.Volunteer_name);
         TextView Slots = findViewById(R.id.persons);
@@ -44,14 +45,12 @@ public class VolunteerView extends AppCompatActivity {
         TextView Priority = findViewById(R.id.priority);
         Button buttonMap = findViewById(R.id.button_map2);
 
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(VolunteerView.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        logout.setOnClickListener(view -> {
+            Intent intent = new Intent(VolunteerView.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
+
         Intent intent = getIntent();
         String volunteerName = intent.getStringExtra("volunteerName");
 
@@ -62,8 +61,8 @@ public class VolunteerView extends AppCompatActivity {
 
         ApiService apiService = retrofit.create(ApiService.class);
 
-        // Step 1: 전체 봉사폼 리스트를 받아오기
-        Call<List<com.example.myapplication_login_test.VolunteerForm>> callAllForms = apiService.getVolunteerForm();
+        // Step 1: 전체 봉사폼 리스트를 가져오기
+        Call<List<VolunteerForm>> callAllForms = apiService.getVolunteerForm();
         callAllForms.enqueue(new Callback<List<VolunteerForm>>() {
             @Override
             public void onResponse(@NonNull Call<List<VolunteerForm>> call, @NonNull Response<List<VolunteerForm>> response) {
@@ -72,11 +71,11 @@ public class VolunteerView extends AppCompatActivity {
 
                     runOnUiThread(() -> {
                         if (volunteerFormList != null && !volunteerFormList.isEmpty()) {
-                            // Step 2: 전체 봉사폼 리스트 중에서 이름이 일치하는 봉사폼 찾기
+                            // Step 2: 이름이 일치하는 봉사폼 찾기
                             VolunteerForm matchingForm = findMatchingForm(volunteerFormList, volunteerName);
 
                             if (matchingForm != null) {
-                                // 봉사 정보를 텍스트 뷰에 표시
+                                // 봉사 정보를 TextView에 표시
                                 try {
                                     VolunteerName.setText(matchingForm.getTitle());
                                     Slots.setText(matchingForm.getSlots() + "명");
@@ -109,40 +108,40 @@ public class VolunteerView extends AppCompatActivity {
             }
         });
 
-        buttonMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String et = Location.getText().toString();
+        buttonMap.setOnClickListener(view -> {
+            String et = Location.getText().toString();
 
-                Geocoder geocoder = new Geocoder(VolunteerView.this, Locale.KOREA);
-                try {
-                    List<Address> addresses = geocoder.getFromLocationName(et, 1);
+            Geocoder geocoder = new Geocoder(VolunteerView.this, Locale.KOREA);
+            try {
+                List<Address> addresses = geocoder.getFromLocationName(et, 1);
 
-                    if (addresses != null && !addresses.isEmpty()) {
-                        Address address = addresses.get(0);
-                        latitude = address.getLatitude();
-                        longitude = address.getLongitude();
+                if (addresses != null && !addresses.isEmpty()) {
+                    Address address = addresses.get(0);
+                    latitude = address.getLatitude();
+                    longitude = address.getLongitude();
 
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        Uri uri = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "&z=10");
-                        intent.setData(uri);
-                        startActivity(intent);
-                    } else {
-                        // Handle the case when no address is found
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // Handle the exception here
+                    Intent intent1 = new Intent(Intent.ACTION_VIEW);
+                    Uri uri = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "&z=10");
+                    intent1.setData(uri);
+                    startActivity(intent1);
+                } else {
+                    // 주소를 찾지 못한 경우 처리
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                // 예외 처리
             }
         });
-        buttonlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(VolunteerView.this, VolunteerListActivity.class);
-                startActivity(intent);
-            }
+
+        buttonlist.setOnClickListener(view -> {
+            Intent intent1 = new Intent(VolunteerView.this, VolunteerListActivity.class);
+            startActivity(intent1);
         });
+
+        // Volunteer 신청 버튼 클릭 리스너
+        Intent intent2 = getIntent();
+        String applicantUsername = intent2.getStringExtra("username");
+        Apply.setOnClickListener(view -> applyForVolunteer(matchingForm.getTitle(), applicantUsername));
     }
 
     // 이름이 일치하는 봉사폼 찾기
@@ -154,4 +153,62 @@ public class VolunteerView extends AppCompatActivity {
         }
         return null;
     }
+
+    // 봉사 신청 메서드
+    private void applyForVolunteer(String volunteerFormTitle, String applicantUsername) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.45.93:8040")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService volunteerService = retrofit.create(ApiService.class);
+
+        // 봉사폼 제목을 기반으로 해당 봉사폼의 ID를 찾아오기
+        Call<Long> findIdCall = volunteerService.findVolunteerFormIdByTitle(volunteerFormTitle);
+        findIdCall.enqueue(new Callback<Long>() {
+            @Override
+            public void onResponse(@NonNull Call<Long> call, @NonNull Response<Long> response) {
+                if (response.isSuccessful()) {
+                    Long volunteerFormId = response.body();
+
+                    if (volunteerFormId != null) {
+                        // 찾아온 봉사폼 ID를 이용하여 봉사 신청
+                        VolunteerApplicationRequest applicationRequest = new VolunteerApplicationRequest();
+                        applicationRequest.setVolunteerFormId(volunteerFormId);
+                        // 다른 필요한 정보들을 설정
+
+                        Call<Void> applyCall = volunteerService.applyForVolunteer(applicationRequest);
+                        applyCall.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사 신청이 완료되었습니다.", Toast.LENGTH_SHORT).show());
+                                } else {
+                                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사 신청에 실패했습니다. 응답 코드: " + response.code(), Toast.LENGTH_SHORT).show());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                                Log.e("VolunteerView", "Network error: " + t.getMessage(), t);
+                                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
+                            }
+                        });
+                    } else {
+                        // 봉사폼 ID가 null인 경우에 대한 처리
+                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사폼 ID가 없습니다.", Toast.LENGTH_SHORT).show());
+                    }
+                } else {
+                    // 서버 응답이 실패한 경우에 대한 처리
+                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "서버오류", Toast.LENGTH_SHORT).show());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Long> call, @NonNull Throwable t) {
+                // 네트워크 오류에 대한 처리
+            }
+        });
+    }
 }
+
