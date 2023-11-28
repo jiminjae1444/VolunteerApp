@@ -49,4 +49,7 @@ public interface ApiService {
 
     @POST("/api/volunteer-application/apply")
     Call<Void> applyForVolunteer(VolunteerApplicationRequest applicationRequest);
+
+    @GET("/api/volunteer-application/close-registration/{volunteerFormId}")
+    Call<Boolean> checkVolunteerFormClosed(@Path("formId") Long formId);
 }

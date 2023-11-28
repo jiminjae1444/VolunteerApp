@@ -67,12 +67,17 @@ public class MainHomeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 // 클릭된 아이템의 위치(position)에 따라 다른 작업을 수행하도록 설정
+                    // 클릭된 아이템의 위치(position)에 따라 다른 작업을 수행하도록 설정
+                    String username = getIntent().getStringExtra("username");
+                    if (username == null) {
+                        // username이 null인 경우에 대한 처리 (예: 기본값 설정)
+                        username = "defaultUsername";
+                    }
                 switch (position) {
                     case 0:
                         // 첫 번째 아이템을 클릭한 경우
                         // 해당 아이템에 대한 작업 수행 (예: 내 정보 관리 액티비티 시작)
                         Intent intent = new Intent(MainHomeActivity.this, MyInfo.class);
-                        String username = getIntent().getStringExtra("username");
                         if (username == null) {
                             // username이 null인 경우에 대한 처리 (예: 기본값 설정)
                             username = "defaultUsername";
@@ -84,12 +89,22 @@ public class MainHomeActivity extends AppCompatActivity {
                         // 두 번째 아이템을 클릭한 경우
                         // 해당 아이템에 대한 작업 수행 (예: 봉사 모집글 작성 액티비티 시작)
                         Intent intent2 = new Intent(MainHomeActivity.this, VolunteerFormActivity.class);
+                        if (username == null) {
+                            // username이 null인 경우에 대한 처리 (예: 기본값 설정)
+                            username = "defaultUsername";
+                        }
+                        intent2.putExtra("username", username);
                         startActivity(intent2);
                         break;
                     // 나머지 아이템들에 대한 작업도 추가 가능
                     // ...
                     case 2:
                         Intent intent3 = new Intent(MainHomeActivity.this, VolunteerListActivity.class);
+                        if (username == null) {
+                            // username이 null인 경우에 대한 처리 (예: 기본값 설정)
+                            username = "defaultUsername";
+                        }
+                        intent3.putExtra("username", username);
                         startActivity(intent3);
                         break;
                     case 3:

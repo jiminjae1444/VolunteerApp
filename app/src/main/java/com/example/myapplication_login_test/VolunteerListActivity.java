@@ -45,8 +45,10 @@ public class VolunteerListActivity extends Activity {
             @Override
             public void onItemClick(int position) {
                 VolunteerEvent clickedEvent = adapter.getVolunteerEvents().get(position);
+                String username = getIntent().getStringExtra("username");
                 Intent intent = new Intent(VolunteerListActivity.this, VolunteerView.class);
                 intent.putExtra("volunteerName", clickedEvent.getVolunteerName());
+                intent.putExtra("username",username);
                 System.out.println(clickedEvent.getVolunteerName());
                 startActivity(intent);
             }
