@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class VolunteerView extends AppCompatActivity {
     double latitude = 37.51231313, longitude = 127.12316546;
     Button Apply;
-
+    private Retrofit retrofit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +55,7 @@ public class VolunteerView extends AppCompatActivity {
         Intent intent = getIntent();
         String volunteerName = intent.getStringExtra("volunteerName");
 
-        Retrofit retrofit = new Retrofit.Builder()
+         retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.45.93:8040")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -143,8 +143,40 @@ public class VolunteerView extends AppCompatActivity {
         Intent intent2 = getIntent();
         String applicantUsername = intent2.getStringExtra("username");
         Apply.setOnClickListener(view -> {
-            String volunteerFormTitle = VolunteerName.getText().toString();
-            checkAndApplyForVolunteer(volunteerFormTitle, applicantUsername);
+
+            VolunteerApplicationRequest applicationRequest = new VolunteerApplicationRequest();
+            applicationRequest.setVolunteerFormName(volunteerName);  // 봉사 폼 이름 설정
+            applicationRequest.setApplicantUsername(applicantUsername); // 사용자명 설정
+
+            // Retrofit 인스턴스 생성
+             retrofit = new Retrofit.Builder()
+                    .baseUrl("http://192.168.45.93:8040") // 서버 API 엔드포인트 URL
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            // Retrofit을 사용하여 ApiService 인터페이스 구현체 생성
+            ApiService volunteerService = retrofit.create(ApiService.class);
+
+            // Retrofit을 사용하여 봉사 신청 요청
+            Call<Void> call = volunteerService.applyForVolunteer(applicationRequest);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        // 서버 응답이 성공적으로 받아졌을 때의 동작
+                        Toast.makeText(getApplicationContext(), "봉사 신청이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // 서버 응답이 실패한 경우의 동작
+                        Toast.makeText(getApplicationContext(), "봉사 신청에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    // 통신 실패 시 동작
+                    Toast.makeText(getApplicationContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 
@@ -157,123 +189,4 @@ public class VolunteerView extends AppCompatActivity {
         }
         return null;
     }
-
-    // 봉사 신청 메서드
-    private void checkAndApplyForVolunteer(String volunteerFormTitle, String applicantUsername) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.45.93:8040")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ApiService volunteerService = retrofit.create(ApiService.class);
-
-        // 봉사폼 제목을 기반으로 해당 봉사폼의 ID를 찾아오기
-        Call<Long> findIdCall = volunteerService.findVolunteerFormIdByTitle(volunteerFormTitle);
-        findIdCall.enqueue(new Callback<Long>() {
-            @Override
-            public void onResponse(@NonNull Call<Long> call, @NonNull Response<Long> response) {
-                if (response.isSuccessful()) {
-                    Long volunteerFormId = response.body();
-
-                    if (volunteerFormId != null) {
-                        // 찾아온 봉사폼 ID를 이용하여 봉사폼의 마감 여부 확인
-                        Call<Boolean> checkClosedCall = volunteerService.checkVolunteerFormClosed(volunteerFormId);
-                        checkClosedCall.enqueue(new Callback<Boolean>() {
-                            @Override
-                            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                                if (response.isSuccessful()) {
-                                    Boolean isClosed = response.body();
-
-                                    if (isClosed != null && !isClosed) {
-                                        // 마감되지 않았다면 봉사 신청 진행
-                                        applyForVolunteer(volunteerFormTitle,applicantUsername);
-                                    } else {
-                                        // 마감된 경우 처리 (예: 메시지 출력, 버튼 비활성화 등)
-                                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "이미 마감된 봉사입니다.", Toast.LENGTH_SHORT).show());
-                                        // 예시: 버튼 비활성화
-                                        Apply.setEnabled(false);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-                                // 네트워크 오류에 대한 처리
-                            }
-                        });
-                    } else {
-                        // 봉사폼 ID가 null인 경우에 대한 처리
-                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사폼 ID가 없습니다.", Toast.LENGTH_SHORT).show());
-                    }
-                } else {
-                    // 서버 응답이 실패한 경우에 대한 처리
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "서버 오류", Toast.LENGTH_SHORT).show());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Long> call, @NonNull Throwable t) {
-                // 네트워크 오류에 대한 처리
-            }
-        });
-    }
-
-    // 봉사 신청 메서드
-    private void applyForVolunteer(String volunteerFormTitle, String applicantUsername) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.45.93:8040")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ApiService volunteerService = retrofit.create(ApiService.class);
-
-        // 봉사폼 제목을 기반으로 해당 봉사폼의 ID를 찾아오기
-        Call<Long> findIdCall = volunteerService.findVolunteerFormIdByTitle(volunteerFormTitle);
-        findIdCall.enqueue(new Callback<Long>() {
-            @Override
-            public void onResponse(@NonNull Call<Long> call, @NonNull Response<Long> response) {
-                if (response.isSuccessful()) {
-                    Long volunteerFormId = response.body();
-
-                    if (volunteerFormId != null) {
-                        // 봉사폼 ID를 기반으로 신청서 생성
-                        VolunteerApplicationRequest application = new VolunteerApplicationRequest();
-                        application.setVolunteerFormId(volunteerFormId);
-                        application.setApplicantUsername(applicantUsername);
-
-                        // 봉사 신청
-                        Call<Void> applyCall = volunteerService.applyForVolunteer(application);
-                        applyCall.enqueue(new Callback<Void>() {
-                            @Override
-                            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                                if (response.isSuccessful()) {
-                                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사 신청이 완료되었습니다.", Toast.LENGTH_SHORT).show());
-                                } else {
-                                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사 신청 실패. 응답 코드: " + response.code(), Toast.LENGTH_SHORT).show());
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show());
-                            }
-                        });
-                    } else {
-                        // 봉사폼 ID가 null인 경우에 대한 처리
-                        runOnUiThread(() -> Toast.makeText(getApplicationContext(), "봉사폼 ID가 없습니다.", Toast.LENGTH_SHORT).show());
-                    }
-                } else {
-                    // 서버 응답이 실패한 경우에 대한 처리
-                    runOnUiThread(() -> Toast.makeText(getApplicationContext(), "서버 오류", Toast.LENGTH_SHORT).show());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Long> call, @NonNull Throwable t) {
-                // 네트워크 오류에 대한 처리
-            }
-        });
-    }
 }
-
-

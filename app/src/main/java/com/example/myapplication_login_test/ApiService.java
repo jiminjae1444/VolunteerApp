@@ -44,12 +44,12 @@ public interface ApiService {
     @GET("/api/volunteer/list/getVolunteerList") // 실제 API 엔드포인트와 메서드를 맞게 수정해야 함
     Call<List<VolunteerList>> getVolunteerList();
 
-    @GET("/api/volunteer/find-id-by-title")
-    Call<Long> findVolunteerFormIdByTitle(@Query("title") String title);
-
     @POST("/api/volunteer-application/apply")
     Call<Void> applyForVolunteer(VolunteerApplicationRequest applicationRequest);
 
-    @GET("/api/volunteer-application/close-registration/{volunteerFormId}")
-    Call<Boolean> checkVolunteerFormClosed(@Path("formId") Long formId);
+    @POST("/api/user/updateExpiredForms")
+    Call<Void> updateExpiredForms();
+
+    @POST("/api/user/updateVolunteerGrade")
+    Call<Void> updateVolunteerGrade();
 }

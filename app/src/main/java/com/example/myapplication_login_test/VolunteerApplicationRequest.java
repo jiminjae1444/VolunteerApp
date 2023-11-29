@@ -1,10 +1,15 @@
 package com.example.myapplication_login_test;
 
 public class VolunteerApplicationRequest {
-    private Long volunteerFormId;
+    private String volunteerFormName;
     private String applicantUsername;
-    public Long getVolunteerFormId() {
-        return volunteerFormId;
+
+    public String getVolunteerFormName() {
+        return volunteerFormName;
+    }
+
+    public void setVolunteerFormName(String volunteerFormName) {
+        this.volunteerFormName = volunteerFormName;
     }
 
     public String getApplicantUsername() {
@@ -13,9 +18,5 @@ public class VolunteerApplicationRequest {
 
     public void setApplicantUsername(String applicantUsername) {
         this.applicantUsername = applicantUsername;
-    }
-
-    public void setVolunteerFormId(Long volunteerFormId) {
-        this.volunteerFormId = volunteerFormId;
     }
 }

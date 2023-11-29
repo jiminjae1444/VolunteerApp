@@ -1,4 +1,5 @@
 package com.example.myapplication_login_test;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +15,11 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainHomeActivity extends AppCompatActivity {
 
@@ -22,14 +28,17 @@ public class MainHomeActivity extends AppCompatActivity {
     private int num_page = 4;
     private RecyclerView recyclerView;
     private MyAdapter2 adapter;
+    private ApiService volunteerApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainhome);
+
         mpager = findViewById(R.id.viewpager);
         pageAdapter = new MyAdapter(this, num_page);
         mpager.setAdapter(pageAdapter);
+
         Button logout = findViewById(R.id.logoutButton);
 
         mpager.setCurrentItem(1000);
@@ -44,8 +53,10 @@ public class MainHomeActivity extends AppCompatActivity {
                 }
             }
         });
+
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, LinearLayoutManager.VERTICAL));
+
         List<MyData> dataList = new ArrayList<>();
         dataList.add(new MyData(R.drawable.ic_baseline_account_circle_24, "내 정보 관리"));
         dataList.add(new MyData(R.drawable.ic_baseline_edit_note_24, "봉사 모집글 작성"));
@@ -55,6 +66,19 @@ public class MainHomeActivity extends AppCompatActivity {
         adapter = new MyAdapter2(dataList);
         recyclerView.setAdapter(adapter);
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.45.93:8040")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        volunteerApi = retrofit.create(ApiService.class);
+
+        // updateExpiredForms 호출
+        updateExpiredForms();
+
+        // updateVolunteerGrade 호출
+        updateVolunteerGrade();
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,47 +87,28 @@ public class MainHomeActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                // 클릭된 아이템의 위치(position)에 따라 다른 작업을 수행하도록 설정
-                    // 클릭된 아이템의 위치(position)에 따라 다른 작업을 수행하도록 설정
-                    String username = getIntent().getStringExtra("username");
-                    if (username == null) {
-                        // username이 null인 경우에 대한 처리 (예: 기본값 설정)
-                        username = "defaultUsername";
-                    }
+                String username = getIntent().getStringExtra("username");
+                if (username == null) {
+                    username = "defaultUsername";
+                }
+
                 switch (position) {
                     case 0:
-                        // 첫 번째 아이템을 클릭한 경우
-                        // 해당 아이템에 대한 작업 수행 (예: 내 정보 관리 액티비티 시작)
                         Intent intent = new Intent(MainHomeActivity.this, MyInfo.class);
-                        if (username == null) {
-                            // username이 null인 경우에 대한 처리 (예: 기본값 설정)
-                            username = "defaultUsername";
-                        }
                         intent.putExtra("username", username);
                         startActivity(intent);
                         break;
                     case 1:
-                        // 두 번째 아이템을 클릭한 경우
-                        // 해당 아이템에 대한 작업 수행 (예: 봉사 모집글 작성 액티비티 시작)
                         Intent intent2 = new Intent(MainHomeActivity.this, VolunteerFormActivity.class);
-                        if (username == null) {
-                            // username이 null인 경우에 대한 처리 (예: 기본값 설정)
-                            username = "defaultUsername";
-                        }
                         intent2.putExtra("username", username);
                         startActivity(intent2);
                         break;
-                    // 나머지 아이템들에 대한 작업도 추가 가능
-                    // ...
                     case 2:
                         Intent intent3 = new Intent(MainHomeActivity.this, VolunteerListActivity.class);
-                        if (username == null) {
-                            // username이 null인 경우에 대한 처리 (예: 기본값 설정)
-                            username = "defaultUsername";
-                        }
                         intent3.putExtra("username", username);
                         startActivity(intent3);
                         break;
@@ -114,8 +119,49 @@ public class MainHomeActivity extends AppCompatActivity {
                 }
             }
         }));
+    }
 
+    private void updateExpiredForms() {
+        Call<Void> call = volunteerApi.updateExpiredForms();
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // Request successful, perform additional tasks
+                } else {
+                    // Server returned an error response
+                    // Handle the error
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Network or unexpected error occurred
+                // Handle the error
+            }
+        });
+    }
+
+    private void updateVolunteerGrade() {
+        Call<Void> call = volunteerApi.updateVolunteerGrade();
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    // Request successful, perform additional tasks
+                } else {
+                    // Server returned an error response
+                    // Handle the error
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // Network or unexpected error occurred
+                // Handle the error
+            }
+        });
     }
 }
+
 
