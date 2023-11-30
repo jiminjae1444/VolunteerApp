@@ -34,6 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class VolunteerFormActivity extends AppCompatActivity {
     private EditText Volunteer_name, persons, description, hours, start_date, end_date;
     EditText editaddress;
@@ -158,20 +159,30 @@ public class VolunteerFormActivity extends AppCompatActivity {
             String volunteerLocation = editaddress.getText().toString();
             String volunteerDescription = description.getText().toString();
             String selectedPriority = priority[0][0];
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String startDate = start_date.getText().toString();
             String endDate = end_date.getText().toString();
+
+            // 현재 날짜 가져오기
+            LocalDate currentDate = LocalDate.now();
+
             try {
+                // 시작일과 종료일 가져오기
                 LocalDate startDateTxt = LocalDate.parse(start_date.getText().toString(), formatter);
-                LocalDate endDateTxt =  LocalDate.parse(end_date.getText().toString(), formatter);
+                LocalDate endDateTxt = LocalDate.parse(end_date.getText().toString(), formatter);
+
+                // 시작일이 현재일로부터 3일 이후인지 확인
+                if (startDateTxt.isAfter(currentDate.plusDays(2))) {
+                    // 여기서 startDate와 endDate를 사용하도록 수정
+                    sendVolunteerForm(volunteerName, volunteerLocation, volunteerDescription, startDate, endDate, volunteerPersons, volunteerHour, selectedPriority);
+                } else {
+                    // 시작일이 현재일로부터 3일 이후가 아닌 경우 사용자에게 메시지 표시
+                    Toast.makeText(getApplicationContext(), "시작일은 현재일로부터 3일 이후로 선택해야 합니다.", Toast.LENGTH_SHORT).show();
+                }
             } catch (DateTimeParseException e) {
                 // 날짜 형식이 올바르지 않을 때 사용자에게 메시지 표시
                 Toast.makeText(getApplicationContext(), "올바른 날짜 및 시간 형식을 입력하십시오.", Toast.LENGTH_SHORT).show();
                 Log.e("VolunteerFormActivity", "Error parsing date: " + e.getMessage());
-                return;
             }
-
-            sendVolunteerForm(volunteerName, volunteerLocation, volunteerDescription, startDate, endDate, volunteerPersons, volunteerHour, selectedPriority);
         } else {
             // 폼이 유효하지 않을 때 수행할 로직을 여기에 추가하세요.
             // 예를 들어, Toast 메시지를 표시하거나 사용자에게 알림을 주는 등의 처리를 할 수 있습니다.
@@ -252,5 +263,6 @@ public class VolunteerFormActivity extends AppCompatActivity {
         editaddress.setText(""); // 봉사 장소 초기화
         description.setText(""); // 주요 내용 초기화
     }
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 }
 
