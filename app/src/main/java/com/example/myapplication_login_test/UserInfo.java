@@ -1,6 +1,7 @@
 package com.example.myapplication_login_test;
 
 public class UserInfo {
+    private long id;
     private String grade;
     private int total_hours;
 
@@ -10,6 +11,14 @@ public class UserInfo {
 
     public void setGrade(String grade) {
         this.grade = grade;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public int getTotal_hours() {

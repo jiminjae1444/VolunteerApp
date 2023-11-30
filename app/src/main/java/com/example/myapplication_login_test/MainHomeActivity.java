@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -29,6 +30,7 @@ public class MainHomeActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MyAdapter2 adapter;
     private ApiService volunteerApi;
+    private String userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,8 @@ public class MainHomeActivity extends AppCompatActivity {
                 .build();
 
         volunteerApi = retrofit.create(ApiService.class);
+        String username = getIntent().getStringExtra("username");
+        getUserInfoAndProceed(username);
 
         // updateExpiredForms 호출
         updateExpiredForms();
@@ -103,9 +107,13 @@ public class MainHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                         break;
                     case 1:
-                        Intent intent2 = new Intent(MainHomeActivity.this, VolunteerFormActivity.class);
-                        intent2.putExtra("username", username);
-                        startActivity(intent2);
+                        if(userType.equals("organization")) {
+                            Intent intent2 = new Intent(MainHomeActivity.this, VolunteerFormActivity.class);
+                            intent2.putExtra("username", username);
+                            startActivity(intent2);
+                        }else{
+                            Toast.makeText(MainHomeActivity.this, "기관만 접근 할 수있습니다.", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 2:
                         Intent intent3 = new Intent(MainHomeActivity.this, VolunteerListActivity.class);
@@ -113,7 +121,8 @@ public class MainHomeActivity extends AppCompatActivity {
                         startActivity(intent3);
                         break;
                     case 3:
-                        Intent intent4 = new Intent(MainHomeActivity.this, MyInfo.class);
+                        Intent intent4 = new Intent(MainHomeActivity.this, VolunteerApplicationList.class);
+                        intent4.putExtra("username", username);
                         startActivity(intent4);
                         break;
                 }
@@ -162,6 +171,31 @@ public class MainHomeActivity extends AppCompatActivity {
             }
         });
     }
+    private void getUserInfoAndProceed(String username) {
+        Call<User> call = volunteerApi.getUserByUsername(username);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    User user = response.body();
+                    if (user != null) {
+                        userType = user.getUserType(); // 전역 변수에 userType 저장
+                        // userType을 사용하여 봉사폼 작성 버튼의 접근 여부 결정
+                    } else {
+                        // 사용자 정보가 null인 경우의 처리
+                        Toast.makeText(MainHomeActivity.this, "사용자 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // 서버에서 오류 응답이 왔을 경우의 처리
+                    Toast.makeText(MainHomeActivity.this, "서버 오류", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // 네트워크 오류 또는 예외 발생 시의 처리
+                Toast.makeText(MainHomeActivity.this, "네트워크 오류", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
-
-

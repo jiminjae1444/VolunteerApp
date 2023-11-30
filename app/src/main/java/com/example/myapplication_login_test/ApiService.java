@@ -6,6 +6,7 @@ import java.util.Map;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
@@ -52,4 +53,13 @@ public interface ApiService {
 
     @POST("/api/user/updateVolunteerGrade")
     Call<Void> updateVolunteerGrade();
+
+    @GET("getVolunteerForm/{volunteerFormId}")
+    Call<VolunteerForm> getVolunteerForm(@Path("volunteerFormId") long volunteerFormId);
+
+    @GET("info/{infoId}/applications")
+    Call<List<VolunteerApplication>> getVolunteerApplicationsForInfo(@Path("infoId") long infoId);
+
+    @DELETE("volunteer/applications/{applicationId}")
+    Call<Void> cancelVolunteerApplication(@Path("applicationId") long applicationId);
 }
