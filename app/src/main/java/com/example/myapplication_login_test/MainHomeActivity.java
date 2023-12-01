@@ -1,11 +1,13 @@
 package com.example.myapplication_login_test;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -93,6 +95,7 @@ public class MainHomeActivity extends AppCompatActivity {
         });
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onItemClick(View view, int position) {
                 String username = getIntent().getStringExtra("username");
@@ -107,8 +110,8 @@ public class MainHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                         break;
                     case 1:
-                        if(userType.equals("organization")) {
-                            Intent intent2 = new Intent(MainHomeActivity.this, VolunteerFormActivity.class);
+                        if(userType.equals("ORGANIZATION")) {
+                            Intent intent2 = new Intent(MainHomeActivity.this,VolunteerFormActivity.class);
                             intent2.putExtra("username", username);
                             startActivity(intent2);
                         }else{
