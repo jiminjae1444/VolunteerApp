@@ -27,6 +27,7 @@
         <activity android:name=".VolunteerListActivity"/>
         <activity android:name=".VolunteerFormActivity"/>
         <activity android:name=".VolunteerView"/>
+        <activity android:name=".VolunteerApplicationList"/>
 
 
     </application>
