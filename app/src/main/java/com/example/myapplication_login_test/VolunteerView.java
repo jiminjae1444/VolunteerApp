@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,6 +31,9 @@ public class VolunteerView extends AppCompatActivity {
     double latitude = 37.51231313, longitude = 127.12316546;
     Button Apply;
     private Retrofit retrofit;
+    private List<VolunteerForm> volunteerFormList; // 클래스 레벨에서 선언
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +61,7 @@ public class VolunteerView extends AppCompatActivity {
         Intent intent = getIntent();
         String volunteerName = intent.getStringExtra("volunteerName");
 
-         retrofit = new Retrofit.Builder()
+        retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.45.93:8040")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -68,7 +74,7 @@ public class VolunteerView extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<List<VolunteerForm>> call, @NonNull Response<List<VolunteerForm>> response) {
                 if (response.isSuccessful()) {
-                    List<VolunteerForm> volunteerFormList = response.body();
+                    volunteerFormList = response.body();
 
                     runOnUiThread(() -> {
                         if (volunteerFormList != null && !volunteerFormList.isEmpty()) {
@@ -143,44 +149,52 @@ public class VolunteerView extends AppCompatActivity {
         Intent intent2 = getIntent();
         String applicantUsername = intent2.getStringExtra("username");
         Apply.setOnClickListener(view -> {
-
-            VolunteerApplicationRequest applicationRequest = new VolunteerApplicationRequest();
-            applicationRequest.setVolunteerFormName(volunteerName);  // 봉사 폼 이름 설정
-            applicationRequest.setApplicantUsername(applicantUsername); // 사용자명 설정
-
-            // Retrofit 인스턴스 생성
-             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://192.168.45.93:8040") // 서버 API 엔드포인트 URL
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            // Retrofit을 사용하여 ApiService 인터페이스 구현체 생성
-            ApiService volunteerService = retrofit.create(ApiService.class);
-
-            // Retrofit을 사용하여 봉사 신청 요청
-            Call<Void> call = volunteerService.applyForVolunteer(applicationRequest);
-            call.enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                    if (response.isSuccessful()) {
-                        // 서버 응답이 성공적으로 받아졌을 때의 동작
-                        Toast.makeText(getApplicationContext(), "봉사 신청이 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // 서버 응답이 실패한 경우의 동작
-                        Toast.makeText(getApplicationContext(), "봉사 신청에 실패하였습니다.", Toast.LENGTH_SHORT).show();
-                    }
+            VolunteerForm matchingForm = findMatchingForm(volunteerFormList, volunteerName);
+            if (matchingForm != null) {
+                // 시작일이 현재 날짜보다 이전인지 확인
+                String startDate = matchingForm.getStart_date();
+                if (LocalDate.now().isBefore(LocalDate.parse(startDate))) {
+                    sendVolunteerApplication(matchingForm.getTitle(), applicantUsername);
+                } else {
+                    // 시작일이 현재 날짜보다 이후인 경우
+                    Toast.makeText(getApplicationContext(), "봉사 신청이 마감되었습니다.", Toast.LENGTH_SHORT).show();
                 }
-
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    // 통신 실패 시 동작
-                    Toast.makeText(getApplicationContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
-                }
-            });
+            } else {
+                Toast.makeText(getApplicationContext(), "일치하는 봉사폼이 없습니다.", Toast.LENGTH_LONG).show();
+            }
         });
     }
 
-    // 이름이 일치하는 봉사폼 찾기
+    private void sendVolunteerApplication(String volunteerName, String applicantUsername) {
+        VolunteerApplicationRequest applicationRequest = new VolunteerApplicationRequest();
+        applicationRequest.setVolunteerFormName(volunteerName);  // 봉사 폼 이름 설정
+        applicationRequest.setApplicantUsername(applicantUsername); // 사용자명 설정
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.45.93:8040") // 서버 API 엔드포인트 URL
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService volunteerService = retrofit.create(ApiService.class);
+
+        Call<Void> call = volunteerService.applyForVolunteer(applicationRequest);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getApplicationContext(), "봉사 신청이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "봉사 신청에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private VolunteerForm findMatchingForm(List<VolunteerForm> formList, String volunteerName) {
         for (VolunteerForm form : formList) {
             if (form.getTitle().equals(volunteerName)) {

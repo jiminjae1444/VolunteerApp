@@ -58,6 +58,8 @@ public class VolunteerListActivity extends Activity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(VolunteerListActivity.this, MainHomeActivity.class);
+                String username = getIntent().getStringExtra("username");
+                intent.putExtra("username",username);
                 startActivity(intent);
             }
         });
