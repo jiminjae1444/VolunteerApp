@@ -142,6 +142,8 @@ public class VolunteerView extends AppCompatActivity {
 
         buttonlist.setOnClickListener(view -> {
             Intent intent1 = new Intent(VolunteerView.this, VolunteerListActivity.class);
+            String username = getIntent().getStringExtra("username");
+            intent.putExtra("username",username);
             startActivity(intent1);
         });
 
