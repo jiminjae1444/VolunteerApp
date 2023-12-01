@@ -32,8 +32,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="10dp"
                 android:text="로그아웃"
-                android:textSize="14dp"
-                android:textstyle="bold"/>
+                android:textSize="14dp" />
 
         </LinearLayout>
 
