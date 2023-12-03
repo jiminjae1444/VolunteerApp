@@ -1,6 +1,9 @@
 package com.example.myapplication_login_test;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
@@ -23,12 +24,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class VolunteerApplictionAdapter extends RecyclerView.Adapter<VolunteerApplictionAdapter.ViewHolder> {
-    private List<VolunteerApplication> applications;
-    private Retrofit retrofit;
+    private List<VolunteerApplicationDTO> applications;
     private ApiService apiService;
 
-
-    public VolunteerApplictionAdapter(List<VolunteerApplication> applications) {
+    public VolunteerApplictionAdapter(List<VolunteerApplicationDTO> applications) {
         this.applications = applications;
     }
 
@@ -39,24 +38,23 @@ public class VolunteerApplictionAdapter extends RecyclerView.Adapter<VolunteerAp
         return new ViewHolder(view);
     }
 
+    @SuppressLint("LongLogTag")
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        VolunteerApplication application = applications.get(holder.getAdapterPosition());
+        VolunteerApplicationDTO applicationDTO = applications.get(holder.getAdapterPosition());
 
-        // VolunteerApplication에서 봉사 이름과 관련된 필드를 가져오는 부분
-        getVolunteerFormName(application.getVolunteerFormId(), holder);
-
-        holder.slotTextView.setText(String.format("신청 상태 : " + application.getStatus()));
-        holder.applicationDateTextView.setText("신청 날짜 : " + application.getApplicationDate());
+        String title = applicationDTO.getVolunteerFormTitle();
+        holder.volunteerNameTextView.setText(title);
+        holder.slotTextView.setText(applicationDTO.getStatus());
+        holder.applicationDateTextView.setText(applicationDTO.getApplicationDate().toString());
 
         holder.viewCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 신청 취소 버튼 클릭 처리
-                // 여기서 신청을 취소하는 논리를 구현할 수 있습니다.
                 int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    cancelApplication(application.getId(), adapterPosition, holder.itemView.getContext());
+                    cancelApplication(applicationDTO.getId(), adapterPosition, holder.itemView.getContext());
                 }
             }
         });
@@ -82,43 +80,14 @@ public class VolunteerApplictionAdapter extends RecyclerView.Adapter<VolunteerAp
         }
     }
 
-    // 서버에서 VolunteerForm 정보를 가져오는 메서드
-    private void getVolunteerFormName(long volunteerFormId, ViewHolder holder) {
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
-        retrofit = new Retrofit.Builder()
+    private void cancelApplication(long applicationId, int position, Context context) {
+        // 서버에서 해당 applicationId에 대한 봉사 신청을 삭제하는 요청
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.45.93:8040")
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         apiService = retrofit.create(ApiService.class);
-        Call<VolunteerForm> call = apiService.getVolunteerForm(volunteerFormId);
-        call.enqueue(new Callback<VolunteerForm>() {
-            @Override
-            public void onResponse(Call<VolunteerForm> call, Response<VolunteerForm> response) {
-                if (response.isSuccessful()) {
-                    VolunteerForm volunteerForm = response.body();
-                    if (volunteerForm != null) {
-                        String volunteerFormName = volunteerForm.getTitle();
-                        holder.volunteerNameTextView.setText(volunteerFormName);
-                    } else {
-                        showToast(holder.itemView.getContext(), "봉사 신청 내역이 없습니다.");
-                    }
-                } else {
-                    showToast(holder.itemView.getContext(), "서버오류.");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<VolunteerForm> call, Throwable t) {
-                showToast(holder.itemView.getContext(), "네트워크 오류.");
-            }
-        });
-    }
-    private void cancelApplication(long applicationId, int position, Context context) {
-        // 서버에서 해당 applicationId에 대한 봉사 신청을 삭제하는 요청
         Call<Void> call = apiService.cancelVolunteerApplication(applicationId);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -141,6 +110,7 @@ public class VolunteerApplictionAdapter extends RecyclerView.Adapter<VolunteerAp
             }
         });
     }
+
     private void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }

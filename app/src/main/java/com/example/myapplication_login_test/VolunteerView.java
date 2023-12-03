@@ -155,6 +155,9 @@ public class VolunteerView extends AppCompatActivity {
             if (matchingForm != null) {
                 // 시작일이 현재 날짜보다 이전인지 확인
                 String startDate = matchingForm.getStart_date();
+                Log.d("Click", "Register button clicked"+startDate + "and "+matchingForm.getTitle());
+                System.out.println(startDate);
+                System.out.println(matchingForm.getTitle());
                 if (LocalDate.now().isBefore(LocalDate.parse(startDate))) {
                     sendVolunteerApplication(matchingForm.getTitle(), applicantUsername);
                 } else {
@@ -167,9 +170,9 @@ public class VolunteerView extends AppCompatActivity {
         });
     }
 
-    private void sendVolunteerApplication(String volunteerName, String applicantUsername) {
+    private void sendVolunteerApplication(String volunteerFormName, String applicantUsername) {
         VolunteerApplicationRequest applicationRequest = new VolunteerApplicationRequest();
-        applicationRequest.setVolunteerFormName(volunteerName);  // 봉사 폼 이름 설정
+        applicationRequest.setVolunteerFormName(volunteerFormName);  // 봉사 폼 이름 설정
         applicationRequest.setApplicantUsername(applicantUsername); // 사용자명 설정
 
         retrofit = new Retrofit.Builder()

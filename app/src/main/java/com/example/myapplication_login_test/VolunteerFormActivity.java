@@ -243,6 +243,8 @@ public class VolunteerFormActivity extends AppCompatActivity {
         //모집글 등록 성공시
         // 스피너 초기 선택 항목으로 설정
         Intent intent = new Intent(VolunteerFormActivity.this,VolunteerListActivity.class);
+        String username = getIntent().getStringExtra("username");
+        intent.putExtra("username",username);
         startActivity(intent);
         Log.e("MyApp", "앱이 강제로 종료됨");
         finish();

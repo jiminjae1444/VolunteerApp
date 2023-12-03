@@ -45,8 +45,9 @@ public interface ApiService {
     @GET("/api/volunteer/list/getVolunteerList") // 실제 API 엔드포인트와 메서드를 맞게 수정해야 함
     Call<List<VolunteerList>> getVolunteerList();
 
+    @Headers("Content-Type: application/json")
     @POST("/api/volunteer-applications/apply")
-    Call<Void> applyForVolunteer(VolunteerApplicationRequest applicationRequest);
+    Call<Void> applyForVolunteer(@Body VolunteerApplicationRequest applicationRequest);
 
     @POST("/api/user/updateExpiredForms")
     Call<Void> updateExpiredForms();
@@ -54,12 +55,9 @@ public interface ApiService {
     @POST("/api/user/updateVolunteerGrade")
     Call<Void> updateVolunteerGrade();
 
-    @GET("/api/volunteer/getVolunteerForm/{volunteerFormId}")
-    Call<VolunteerForm> getVolunteerForm(@Path("volunteerFormId") Long volunteerFormId);
-
     @GET("/api/volunteer-applications/info/{infoId}/applications")
-    Call<List<VolunteerApplication>> getVolunteerApplicationsForInfo(@Path("infoId") Long infoId);
+    Call<List<VolunteerApplicationDTO>> getVolunteerApplicationsForInfo(@Path("infoId") Long infoId);
 
-    @DELETE("/api/volunteer-applications//{applicationId}")
+    @DELETE("/api/volunteer-applications/{applicationId}")
     Call<Void> cancelVolunteerApplication(@Path("applicationId") Long applicationId);
 }

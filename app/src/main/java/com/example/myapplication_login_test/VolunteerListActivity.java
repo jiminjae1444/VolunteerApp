@@ -32,6 +32,7 @@ public class VolunteerListActivity extends Activity {
         volunteerRecyclerView.setAdapter(adapter);
         Button main = findViewById(R.id.buttonToMain);
         volunteerRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        String username = getIntent().getStringExtra("username");
         fetchVolunteerList();
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

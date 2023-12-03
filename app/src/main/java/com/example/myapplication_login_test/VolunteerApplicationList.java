@@ -1,5 +1,6 @@
 package com.example.myapplication_login_test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ public class VolunteerApplicationList extends AppCompatActivity {
     private VolunteerApplictionAdapter adapter;
     private ApiService volunteerApi;
     private String username;
+    private Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,14 +35,26 @@ public class VolunteerApplicationList extends AppCompatActivity {
 
         volunteerRecyclerView = findViewById(R.id.volunteerRecyclerView);
         volunteerRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        Button logout = findViewById(R.id.logoutButton);
         Button buttonToMain = findViewById(R.id.buttonToMain);
         buttonToMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(VolunteerApplicationList.this, MainHomeActivity.class);
+                intent.putExtra("username", username);
+                startActivity(intent);
                 finish();
             }
         });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(VolunteerApplicationList.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
 
         // 받아온 username
         username = getIntent().getStringExtra("username");
@@ -95,15 +109,21 @@ public class VolunteerApplicationList extends AppCompatActivity {
 
     private void getVolunteerApplicationsForInfo(long infoId) {
         // 서버에서 해당 infoid에 대한 봉사 신청 목록을 가져오는 요청
-        Call<List<VolunteerApplication>> call = volunteerApi.getVolunteerApplicationsForInfo(infoId);
-        call.enqueue(new Callback<List<VolunteerApplication>>() {
+        Call<List<VolunteerApplicationDTO>> call = volunteerApi.getVolunteerApplicationsForInfo(infoId);
+        call.enqueue(new Callback<List<VolunteerApplicationDTO>>() {
             @Override
-            public void onResponse(Call<List<VolunteerApplication>> call, Response<List<VolunteerApplication>> response) {
+            public void onResponse(Call<List<VolunteerApplicationDTO>> call, Response<List<VolunteerApplicationDTO>> response) {
                 if (response.isSuccessful()) {
-                    List<VolunteerApplication> applications = response.body();
-                    if (applications != null && !applications.isEmpty()) {
+                    List<VolunteerApplicationDTO> applicationDTOs = response.body();
+                    if (applicationDTOs != null && !applicationDTOs.isEmpty()) {
                         // 서버에서 봉사 신청 목록을 받아왔으면, RecyclerView에 표시
-                        displayVolunteerApplications(applications);
+                        displayVolunteerApplications(applicationDTOs);
+
+                        // 추가 코드: infoid를 통해 받아온 데이터 확인하는 로그
+                        for (VolunteerApplicationDTO applicationDTO : applicationDTOs) {
+                            Log.d("VolunteerListActivity", "Application ID: " + applicationDTO.getId());
+                            // 여기에 원하는 다른 필드도 추가로 출력 가능
+                        }
                     } else {
                         // 봉사 신청이 없는 경우에 대한 처리
                         Toast.makeText(VolunteerApplicationList.this, "봉사 신청이 없습니다.", Toast.LENGTH_SHORT).show();
@@ -115,7 +135,7 @@ public class VolunteerApplicationList extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<VolunteerApplication>> call, Throwable t) {
+            public void onFailure(Call<List<VolunteerApplicationDTO>> call, Throwable t) {
                 // 네트워크 오류 또는 예외 발생 시에 대한 처리
                 Log.e("VolunteerListActivity", "Error getting volunteer applications: " + t.getMessage());
                 Toast.makeText(VolunteerApplicationList.this, "네트워크 오류 또는 예외 발생", Toast.LENGTH_SHORT).show();
@@ -123,7 +143,7 @@ public class VolunteerApplicationList extends AppCompatActivity {
         });
     }
 
-    private void displayVolunteerApplications(List<VolunteerApplication> applications) {
+    private void displayVolunteerApplications(List<VolunteerApplicationDTO> applications) {
         // 어댑터를 생성하고 RecyclerView에 설정
         adapter = new VolunteerApplictionAdapter(applications);
         volunteerRecyclerView.setAdapter(adapter);
