@@ -49,6 +49,10 @@ public class VolunteerApplictionAdapter extends RecyclerView.Adapter<VolunteerAp
         holder.slotTextView.setText(applicationDTO.getStatus());
         holder.applicationDateTextView.setText(applicationDTO.getApplicationDate().toString());
 
+        boolean isStatusCompleted = "신청완료".equals(applicationDTO.getStatus());
+        holder.viewCancelButton.setEnabled(!isStatusCompleted);
+
+
         holder.viewCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

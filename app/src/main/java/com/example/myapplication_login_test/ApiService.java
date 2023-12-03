@@ -60,4 +60,7 @@ public interface ApiService {
 
     @DELETE("/api/volunteer-applications/{applicationId}")
     Call<Void> cancelVolunteerApplication(@Path("applicationId") Long applicationId);
+
+    @POST("/api/volunteer-applications/update-status-for-expired-applications")
+    Call<String> updateStatusForExpiredApplications();
 }

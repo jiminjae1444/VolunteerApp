@@ -189,7 +189,7 @@ public class VolunteerView extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(getApplicationContext(), "봉사 신청이 완료되었습니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "봉사 신청에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "정원이 다찼거나 이미 신청한 봉사이므로 봉사 신청에 실패하였습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
 
