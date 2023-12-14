@@ -81,14 +81,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
         button_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

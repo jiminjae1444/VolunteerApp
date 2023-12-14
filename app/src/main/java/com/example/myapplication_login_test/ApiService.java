@@ -63,4 +63,8 @@ public interface ApiService {
 
     @POST("/api/volunteer-applications/update-status-for-expired-applications")
     Call<String> updateStatusForExpiredApplications();
+
+    @GET("/api/volunteer/experienced-forms-starting-two-days-before")
+    Call<List<VolunteerForm>> getExperiencedFormsStartingTwoDaysBefore();
+
 }

@@ -17,6 +17,8 @@ import com.google.gson.GsonBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -95,7 +97,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
                                         startActivity(intent);
                                     } else {
                                         // 로그인 실패 시 실행할 코드 작성
-                                        Toast.makeText(LoginActivity.this, "등록된 아이디와 비밀번호가 아닙니다", Toast.LENGTH_SHORT).show();
+                                        try {
+                                            String errorResponse = response.errorBody().string();
+                                            Toast.makeText(LoginActivity.this, errorResponse, Toast.LENGTH_LONG).show();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 } else {
                                     Toast.makeText(LoginActivity.this, "응답 오류: 응답이 비어 있음", Toast.LENGTH_SHORT).show();

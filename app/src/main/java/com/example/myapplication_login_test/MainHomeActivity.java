@@ -85,6 +85,8 @@
     
             // updateVolunteerGrade 호출
             updateVolunteerGrade();
+
+            checkExperiencedFormsStartingTwoDaysBefore();
     
             logout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -133,26 +135,74 @@
                 }
             }));
         }
-    
+        private void checkExperiencedFormsStartingTwoDaysBefore() {
+            // 경력자 전용 봉사폼 조회
+            String username = getIntent().getStringExtra("username");
+            if (username == null) {
+                username = "defaultUsername";
+            }
+
+            Call<UserInfo> userInfoCall = volunteerApi.getUserInfoByUsername(username);
+            userInfoCall.enqueue(new Callback<UserInfo>() {
+                @Override
+                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                    if (response.isSuccessful()) {
+                        UserInfo userInfo = response.body();
+
+                        if (userInfo != null && "경력자".equals(userInfo.getGrade())) {
+                            // 사용자가 경력자인 경우에만 경력자용 봉사폼 조회
+                            Call<List<VolunteerForm>> formsCall = volunteerApi.getExperiencedFormsStartingTwoDaysBefore();
+                            formsCall.enqueue(new Callback<List<VolunteerForm>>() {
+                                @Override
+                                public void onResponse(Call<List<VolunteerForm>> call, Response<List<VolunteerForm>> response) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        List<VolunteerForm> volunteerForms = response.body();
+
+                                        // 시작일이 2일 전인 봉사폼이 있는 경우 토스트 메시지 표시
+                                        if (!volunteerForms.isEmpty()) {
+                                            Toast.makeText(MainHomeActivity.this, "시작일이 2일 전인 경력자용 봉사폼이 있습니다. 어서 신청하세요", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<List<VolunteerForm>> call, Throwable t) {
+                                    // 통신 실패 시 처리
+                                    Toast.makeText(MainHomeActivity.this, "통신오류", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserInfo> call, Throwable t) {
+                    // 통신 실패 시 처리
+                    Toast.makeText(MainHomeActivity.this, "네트워크 오류", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
+
+
         private void updateExpiredForms() {
             Call<Void> call = volunteerApi.updateExpiredForms();
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        // Request successful, perform additional tasks
-                        Toast.makeText(MainHomeActivity.this, "봉사시간이 성공적으로 업데이트되었습니다.", Toast.LENGTH_SHORT).show();
+
+                   //      Toast.makeText(MainHomeActivity.this, "봉사시간이 성공적으로 업데이트되었습니다.", Toast.LENGTH_SHORT).show();
                     } else {
-                        // Server returned an error response
-                        // Handle the error
+
                         Toast.makeText(MainHomeActivity.this, "봉사시간을 업데이트하는 데 실패했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
     
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    // Network or unexpected error occurred
-                    // Handle the error
+
                     Toast.makeText(MainHomeActivity.this, "업데이트하는 동안 네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -164,19 +214,17 @@
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        // Request successful, perform additional tasks
-                        Toast.makeText(MainHomeActivity.this, "봉사 등급이 성공적으로 업데이트되었습니다.", Toast.LENGTH_SHORT).show();
+
+                 //       Toast.makeText(MainHomeActivity.this, "봉사 등급이 성공적으로 업데이트되었습니다.", Toast.LENGTH_SHORT).show();
                     } else {
-                        // Server returned an error response
-                        // Handle the error
+
                         Toast.makeText(MainHomeActivity.this, "봉사 등급을 업데이트하는 데 실패했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
     
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    // Network or unexpected error occurred
-                    // Handle the error
+
                     Toast.makeText(MainHomeActivity.this, "봉사 등급을 업데이트하는 동안 네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                 }
             });
